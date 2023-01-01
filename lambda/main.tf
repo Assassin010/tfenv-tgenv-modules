@@ -22,7 +22,7 @@ EOF
 resource "aws_iam_policy" "lambda_logging" {
   name        = "lambda_logging"
   description = "IAM policy for logging from a lambda"
-  policy = <<EOF
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -49,12 +49,20 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
+data "archive_file" "my_lambda" {
+
+  source_dir  = "${path.module}/lambdas/my_lambda/"
+  output_path = "${path.module}/files/my_lambda.zip"
+  type        = "zip"
+}
 
 resource "aws_lambda_function" "test_lambda" {
-  filename         = "lambda_function.zip"
-  function_name    = "WhizlabsAPI"
-  role             = aws_iam_role.iam_for_lambda.arn
-  handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.8"
-  source_code_hash = filebase64sha256("lambda_function.zip")
+  filename      = "lambda_function.zip"
+  function_name = "kwatatshey"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.8"
+  filename = "${var.zip_output_dir}/lambda_function.zip" // <----- specify root dir as a var
+  source_code_hash  = "${data.archive_file.lambda_function.output_base64sha256}"
 }
+  /*source_code_hash = filebase64sha256("lambda_function.zip")*/
